@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 #include <math.h>
+#include <memory>
+#include <functional>
 
 using std::vector;
 using std::cout;
@@ -32,7 +34,7 @@ public:
 		int dimensions;
 		float initial_condition; // IC @ x=0
 		vector<double> x, y; // Containers for x and y
-		double(*differential_equation)(double, double)=MyFunction;
+		std::function<double(double, double)> MyFunction;
 	}Eqn;
 
 protected:
@@ -42,9 +44,9 @@ protected:
 };
 void Algorithm::FillX()
 {
-	for (double i = 0; i <=this->target_x ; i+=this->step_size)
+	for (double i = 0; i <= target_x ; i+= step_size)
 	{
-		this->Eqn.x.push_back(i);
+		Eqn.x.push_back(i);
 	}
 }
 
@@ -61,25 +63,25 @@ private:
 };
 RK38::RK38(float step, float final_x, float IC)
 {
-	this->step_size = step;
-	this->target_x = final_x;
-	this->initial_condition = IC;
+	step_size = step;
+	target_x = final_x;
+	initial_condition = IC;
 };
 void RK38::SetIC()
 {
-	this->Eqn.y.push_back(initial_condition);
+	Eqn.y.push_back(initial_condition);
 }
 float RK38::Solve()
 {
 	SetIC();
 	FillX();
-	for (int i = 1; i<this->target_x; ++i)
+	for (auto i = 1; i< target_x; ++i)
 	{
-		k1 = this->step_size*this->Eqn.differential_equation(this->Eqn.x.at(i - 1), this->Eqn.y.at(i - 1));
-		k2 = this->step_size*this->Eqn.differential_equation(this->Eqn.x.at(i - 1)+(this->step_size/3), this->Eqn.y.at(i - 1)+(k1/3.0));
-		k3 = this->step_size*this->Eqn.differential_equation(this->Eqn.x.at(i - 1) + (2 * this->step_size) / 3.0, this->Eqn.y.at(i - 1) - (k1 / 3.0) + k2);
-		k4 = this->step_size*this->Eqn.differential_equation(this->Eqn.x.at(i - 1)+this->step_size, this->Eqn.y.at(i - 1)+k1-k2+k3);
-		this->Eqn.y.push_back(this->Eqn.y.at(i - 1) + (1.0 / 8.0)*(k1 + 3 * k2 + 3 * k3 + k4));
+		k1 = step_size*Eqn.differential_equation(Eqn.x.at(i - 1), Eqn.y.at(i - 1));
+		k2 = step_size*Eqn.differential_equation(Eqn.x.at(i - 1)+(step_size/3), Eqn.y.at(i - 1)+(k1/3.0));
+		k3 = step_size*Eqn.differential_equation(Eqn.x.at(i - 1) + (2 * step_size) / 3.0, Eqn.y.at(i - 1) - (k1 / 3.0) + k2);
+		k4 = step_size*Eqn.differential_equation(Eqn.x.at(i - 1)+step_size, Eqn.y.at(i - 1)+k1-k2+k3);
+		Eqn.y.push_back(Eqn.y.at(i - 1) + (1.0 / 8.0)*(k1 + 3 * k2 + 3 * k3 + k4));
 	}
 
 	return 0;
@@ -92,7 +94,8 @@ double MyFunction(double x, double y)
 
 int main()
 {
-	Algorithm *RK = new RK38(1.1, 10, 2);
+    auto RK = std::make_shared<RK38>(1.1, 10, 2);
+    RK->Eqn = MyFunction;
 	RK->Solve();
     return 0;
 }

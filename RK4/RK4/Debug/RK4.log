@@ -1,0 +1,3 @@
+﻿  RK4.cpp
+c:\users\data\documents\github\runge-kutta\rk4\src\rk4.cpp(52): warning C4244: 'initializing': conversion from 'double' to 'unsigned int', possible loss of data
+  RK4.vcxproj -> C:\Users\Data\Documents\GitHub\Runge-Kutta\RK4\RK4\Debug\RK4.exe

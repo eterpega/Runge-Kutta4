@@ -38,9 +38,9 @@ protected:
 };
 void Algorithm::FillX()
 {
-	for (double i = 0; i <= this->target_x; i += this->step_size)
+	for (double i = 0; i <= target_x; i += step_size)
 	{
-		this->Eqn.x.push_back(i);
+		Eqn.x.push_back(i);
 	}
 }
 
@@ -57,11 +57,11 @@ private:
 };
 RK45::RK45(float step, float final_x, float IC)
 {
-	this->step_size = step;
-	this->target_x = final_x;
-	this->initial_condition = IC;
-	this->Eqn.y.push_back(initial_condition);
-	this->Eqn.x.push_back(0);
+	step_size = step;
+	target_x = final_x;
+	initial_condition = IC;
+	Eqn.y.push_back(initial_condition);
+	Eqn.x.push_back(0);
 };
 
 
@@ -69,30 +69,31 @@ RK45::RK45(float step, float final_x, float IC)
 
 float RK45::Solve()
 {
-	double temp_y, temp_x=0;
+	double temp_y;
+	double temp_x=0;
 	double position = 1;
-	for (double i = 1; this->Eqn.x.back()< this->target_x; ++i)
+	for (auto i = 1; Eqn.x.back()< target_x; ++i)
 	{
 
-		k1 = this->step_size*this->Eqn.differential_equation(this->Eqn.x.at(position -1), this->Eqn.y.at(position -1));
-		k2 = this->step_size*this->Eqn.differential_equation(this->Eqn.x.at(position -1) + (this->step_size / 4), this->Eqn.y.at(position -1) + (k1 / 4.0));
-		k3 = this->step_size*this->Eqn.differential_equation(this->Eqn.x.at(position -1) + 3.0*(this->step_size / 8.0), this->Eqn.y.at(position -1) + (3.0*k1 / 32.0) + k2*(9.0 / 32.0));
-		k4 = this->step_size*this->Eqn.differential_equation(this->Eqn.x.at(position -1) + this->step_size, this->Eqn.y.at(position -1) + (1932.0 / 2197.0)*k1 - (7200 / 2197)*k2 + (7296 / 2197)*k3);
-		k5 = this->step_size*this->Eqn.differential_equation(this->Eqn.x.at(position -1) + this->step_size, this->Eqn.y.at(position -1) + (439 / 216)*k1 - (8.0*k2) + (3680.0 / 513.0)*k3 - (845 / 4104)*k4);
-		k6 = this->step_size*this->Eqn.differential_equation(this->Eqn.x.at(position -1) + 0.5*this->step_size, this->Eqn.y.at(position -1) - (8.0 / 27)*k1 + 2.0*k2 - (3544 / 2565)*k3 + (1859 / 4104)*k4 - (11.0 / 40.0)*k5);
-		temp_y = this->Eqn.y.at(position - 1) + (16.0 / 135.0)*k1 + (6656.0 / 12825.0)*k3 + (28561.0 / 56430.0)*k4 - (9.0 / 50.0)*k5 + (2.0 / 55.0)*k6;
+		k1 = step_size*Eqn.differential_equation(Eqn.x.at(position -1), Eqn.y.at(position -1));
+		k2 = step_size*Eqn.differential_equation(Eqn.x.at(position -1) + (step_size / 4), Eqn.y.at(position -1) + (k1 / 4.0));
+		k3 = step_size*Eqn.differential_equation(Eqn.x.at(position -1) + 3.0*(this->step_size / 8.0), Eqn.y.at(position -1) + (3.0*k1 / 32.0) + k2*(9.0 / 32.0));
+		k4 = step_size*Eqn.differential_equation(Eqn.x.at(position -1) + step_size, Eqn.y.at(position -1) + (1932.0 / 2197.0)*k1 - (7200 / 2197)*k2 + (7296 / 2197)*k3);
+		k5 = step_size*Eqn.differential_equation(Eqn.x.at(position -1) + step_size, Eqn.y.at(position -1) + (439 / 216)*k1 - (8.0*k2) + (3680.0 / 513.0)*k3 - (845 / 4104)*k4);
+		k6 = step_size*Eqn.differential_equation(Eqn.x.at(position -1) + 0.5*step_size, Eqn.y.at(position -1) - (8.0 / 27)*k1 + 2.0*k2 - (3544 / 2565)*k3 + (1859 / 4104)*k4 - (11.0 / 40.0)*k5);
+		temp_y = Eqn.y.at(position - 1) + (16.0 / 135.0)*k1 + (6656.0 / 12825.0)*k3 + (28561.0 / 56430.0)*k4 - (9.0 / 50.0)*k5 + (2.0 / 55.0)*k6;
 
 		if (flag == false)
 		{
 			temp_x += step_size;
 			this->Eqn.x.push_back(temp_x);
 			CalculateStepSize(temp_y, temp_x);
-			this->Eqn.y.push_back(temp_y);
+			Eqn.y.push_back(temp_y);
 		}
 		else
 		{
-			this->Eqn.y.pop_back();
-			this->Eqn.y.push_back(temp_y);			
+			Eqn.y.pop_back();
+			Eqn.y.push_back(temp_y);			
 			flag = false;
 			position++;
 		}
@@ -105,7 +106,7 @@ void RK45::CalculateStepSize(double t_y, double t_x)
 {
 	double s;
 	s = 0.84*pow(step_size / (2.0 * abs((t_x - t_y))), 0.25);
-	if (s*this->Eqn.x.back() < 1)
+	if (s*Eqn.x.back() < 1)
 		step_size = s*t_x;
 	flag = 1;
 }

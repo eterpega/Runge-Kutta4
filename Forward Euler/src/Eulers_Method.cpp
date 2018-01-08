@@ -13,7 +13,7 @@ using std::endl;
 	public:
 		float step_size=0.01; // Step Size Used
 		float target_x=4; // x Value of Interest
-		float Solve(); // Main Algorithm
+		void Solve(); // Main Algorithm
 		
 		 class Equation // Holds Equation-Based Data
 		{
@@ -28,7 +28,7 @@ using std::endl;
 	}Algo;
 
 
-	float Algorithm::Solve()
+	void Algorithm::Solve()
 	{
 		cout << "Solving..." << endl;
 		Algo.Eqn.x.push_back(0);
@@ -39,16 +39,12 @@ using std::endl;
 			Algo.Eqn.y.push_back(Algo.Eqn.y.back() +step_size*Eqn.differential_equation(Algo.Eqn.y.back()));
 			cout << "X: " << Algo.Eqn.x.back() << "    " << "Y: " << Algo.Eqn.y.back() << endl;
 		}
-		return 0;
 	}
 
-	
 	float MyFunction(float x)
 	{
-		float y =x;
-		return y;
+		return x;
 	}
-
 
 int main()
 {
